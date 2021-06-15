@@ -12,6 +12,7 @@ export TMPDIR=$(mktemp -d)
 trap "rm -rf $TMPDIR {snakemake.output.vcf} {snakemake.output.tbi}" ERR
 
 jannovar annotate-vcf \
+    --show-all \
     -d {snakemake.input.ser} \
     -i {snakemake.input.vcf} \
     -o $TMPDIR/tmp.vcf.gz

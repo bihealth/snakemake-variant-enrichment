@@ -3,7 +3,6 @@ configfile: "../config/config.yaml"
 
 #: Array of chromosomes for easy iteration.
 CHROMS = list(map(str, range(1, 23))) + ["X", "Y"]
-CHROMS = ["22"]
 
 
 def get_output_files():
@@ -68,8 +67,6 @@ rule run_download_igsr_phase_3:
     output:
         vcf="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz",
         tbi="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi",
-        vcf_log="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.log",
-        tbi_log="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi.log",
     conda:
         "envs/base.yaml"
     script:
@@ -98,7 +95,7 @@ rule run_download_gnomad_exomes_v2_1_1:
         vcf="gnomad-v2.1.1-GRCh37/gnomad-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
         tbi="gnomad-v2.1.1-GRCh37/gnomad-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz.tbi",
     conda:
-        "envs/base.yml"
+        "envs/base.yaml"
     script:
         "scripts/download_gnomad_exomes_v2_1_1.py"
 
