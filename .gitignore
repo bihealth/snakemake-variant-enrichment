@@ -1,3 +1,16 @@
+# Files
+/background/**/*.vcf.gz
+/background/**/*.vcf.bgz
+/background/**/*.tbi
+/background/**/*.h2.db
+/background/**/*.ser*
+/background/**/*.fa
+/background/**/*.fa.fai
+
+
+# Snakemake
+.snakemake/
+
 # Temporary files from text editors.
 *~
 .*.sw?

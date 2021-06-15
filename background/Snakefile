@@ -1,0 +1,113 @@
+configfile: "../config/config.yaml"
+
+
+#: Array of chromosomes for easy iteration.
+CHROMS = list(map(str, range(1, 23))) + ["X", "Y"]
+CHROMS = ["22"]
+
+
+def get_output_files():
+    for entry in config["background"]:
+        if entry.get("enable", False):
+            key = "%s-%s-%s" % (entry["dataset"], entry["release"], entry["reference"])
+            yield "%(key)s/%(key)s.annotated.filtered.vcf.gz" % {"key": key}
+            yield "%(key)s/%(key)s.annotated.filtered.vcf.gz.tbi" % {"key": key}
+
+
+rule default:
+    input:
+        list(get_output_files()),
+
+
+rule run_concat_filtered:
+    input:
+        vcf=expand(
+            "{{dataset}}-{{release}}-{{reference}}/filtered/{{dataset}}-{{release}}-{{reference}}.chr{chrom}.vcf.gz",
+            chrom=CHROMS,
+        ),
+    output:
+        vcf="{dataset}-{release}-{reference}/{dataset}-{release}-{reference}.annotated.filtered.vcf.gz",
+        tbi="{dataset}-{release}-{reference}/{dataset}-{release}-{reference}.annotated.filtered.vcf.gz.tbi",
+    conda:
+        "envs/base.yaml"
+    script:
+        "scripts/concat_vcf.py"
+
+
+rule run_filter:
+    input:
+        vcf="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz",
+        tbi="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi",
+    output:
+        vcf="igsr-phase3-GRCh37/filtered/igsr-phase3-GRCh37.chr{chrom}.vcf.gz",
+        tbi="igsr-phase3-GRCh37/filtered/igsr-phase3-GRCh37.chr{chrom}.vcf.gz.tbi",
+    conda:
+        "envs/base.yaml"
+    script:
+        "scripts/filter_vcf.py"
+
+rule run_annotate_igsr_phase_3:
+    input:
+        vcf="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz",
+        tbi="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi",
+        ser="jannovar/refseq_105_hg19.ser",
+        db="jannovar/GRCh37_frequencies.h2.db",
+    output:
+        vcf="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz",
+        tbi="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi",
+    params:
+        genome_release="GRCh37",
+        table_name="gnomad_exomes_r2_1_1",
+    conda:
+        "envs/jannovar.yaml",
+    script:
+        "scripts/annotate_vcf.py"
+
+
+rule run_download_igsr_phase_3:
+    output:
+        vcf="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz",
+        tbi="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi",
+        vcf_log="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.log",
+        tbi_log="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi.log",
+    conda:
+        "envs/base.yaml"
+    script:
+        "scripts/download_igsr_phase_3.py"
+
+
+rule run_import_jannovar_gnomad_exomes_v2_1_1:
+    output:
+        db="jannovar/GRCh37_frequencies.h2.db",
+    input:
+        vcf=expand(
+            "gnomad-v2.1.1-GRCh37/gnomad-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
+            chrom=CHROMS,
+        ),
+    conda:
+        "envs/jannovar.yaml"
+    params:
+        genome_release="GRCh37",
+        table_name="gnomad_exomes_r2_1_1",
+    script:
+        "scripts/import_jannovar.py"
+
+
+rule run_download_gnomad_exomes_v2_1_1:
+    output:
+        vcf="gnomad-v2.1.1-GRCh37/gnomad-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
+        tbi="gnomad-v2.1.1-GRCh37/gnomad-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz.tbi",
+    conda:
+        "envs/base.yml"
+    script:
+        "scripts/download_gnomad_exomes_v2_1_1.py"
+
+
+rule run_download_jannovar:
+    output:
+        ser="jannovar/refseq_105_hg19.ser",
+        ser_md5="jannovar/refseq_105_hg19.ser.md5",
+    conda:
+        "envs/base.yaml"
+    script:
+        "scripts/download_jannovar.py"

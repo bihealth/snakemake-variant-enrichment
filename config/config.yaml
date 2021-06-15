@@ -1,0 +1,27 @@
+references:
+  GRCh37:
+    path: /fast/projects/cubit/current/static_data/reference/GRCh37/hs37d5/hs37d5.fa
+
+# Configuration for pre-filter for reducing dataset to candidate pathogenic
+# files (rare, amino acid changing).
+prefilter:
+  max_freq: 0.01
+  impacts: [MEDIUM, HIGH]
+
+# Configure the background data sets.
+background:
+  - dataset: igsr
+    release: phase3
+    reference: GRCh37
+    description: >
+      IGSR phase 3 integrated call set.
+    enable: true
+  - dataset: gnomad-exomes
+    reference: GRCh37
+    release: v2.1.1
+    description: >
+      gnomAD exomes data set.
+    enable: false
+    annotation:
+      vep: 88
+      gencode: 19

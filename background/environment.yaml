@@ -1,0 +1,7 @@
+name: snakemake-variant-enrichment
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - snakemake ==6.4
+  - snakefmt ==0.4
