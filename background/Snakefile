@@ -33,10 +33,22 @@ rule run_concat_filtered:
         "scripts/concat_vcf.py"
 
 
-rule run_filter:
+rule run_filter_igsr_phase_3:
     input:
-        vcf="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz",
-        tbi="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi",
+        vcf="gnomad-exomes-v2.1.1-GRCh37/annotated/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
+        tbi="gnomad-exomes-v2.1.1-GRCh37/annotated/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz.tbi",
+    output:
+        vcf="gnomad-exomes-v2.1.1-GRCh37/filtered/gnomad-exomes-v2.1.1-GRCh37.chr{chrom}.vcf.gz",
+        tbi="gnomad-exomes-v2.1.1-GRCh37/filtered/gnomad-exomes-v2.1.1-GRCh37.chr{chrom}.vcf.gz.tbi",
+    conda:
+        "envs/base.yaml"
+    script:
+        "scripts/filter_vcf.py"
+
+rule run_filter_gnomad_exomeS_v2_1_1:
+    input:
+        vcf="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz",
+        tbi="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz.tbi",
     output:
         vcf="igsr-phase3-GRCh37/filtered/igsr-phase3-GRCh37.chr{chrom}.vcf.gz",
         tbi="igsr-phase3-GRCh37/filtered/igsr-phase3-GRCh37.chr{chrom}.vcf.gz.tbi",
@@ -47,13 +59,31 @@ rule run_filter:
 
 rule run_annotate_igsr_phase_3:
     input:
-        vcf="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz",
-        tbi="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi",
+        vcf="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz",
+        tbi="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz.tbi",
         ser="jannovar/refseq_105_hg19.ser",
         db="jannovar/GRCh37_frequencies.h2.db",
     output:
-        vcf="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz",
-        tbi="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi",
+        vcf="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz",
+        tbi="igsr-phase3-GRCh37/annotated/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz.tbi",
+    params:
+        genome_release="GRCh37",
+        table_name="gnomad_exomes_r2_1_1",
+    conda:
+        "envs/jannovar.yaml",
+    script:
+        "scripts/annotate_vcf.py"
+
+        
+rule run_annotate_gnomad_exomes_v2_1_1:
+    input:
+        vcf="gnomad-exomes-v2.1.1-GRCh37/stripped/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
+        tbi="gnomad-exomes-v2.1.1-GRCh37/stripped/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz.tbi",
+        ser="jannovar/refseq_105_hg19.ser",
+        db="jannovar/GRCh37_frequencies.h2.db",
+    output:
+        vcf="gnomad-exomes-v2.1.1-GRCh37/annotated/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
+        tbi="gnomad-exomes-v2.1.1-GRCh37/annotated/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz.tbi",
     params:
         genome_release="GRCh37",
         table_name="gnomad_exomes_r2_1_1",
@@ -65,8 +95,8 @@ rule run_annotate_igsr_phase_3:
 
 rule run_download_igsr_phase_3:
     output:
-        vcf="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz",
-        tbi="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi",
+        vcf="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz",
+        tbi="igsr-phase3-GRCh37/download/ALL.chr{chrom}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz.tbi",
     conda:
         "envs/base.yaml"
     script:
@@ -78,7 +108,7 @@ rule run_import_jannovar_gnomad_exomes_v2_1_1:
         db="jannovar/GRCh37_frequencies.h2.db",
     input:
         vcf=expand(
-            "gnomad-v2.1.1-GRCh37/gnomad-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
+            "gnomad-exomes-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
             chrom=CHROMS,
         ),
     conda:
@@ -90,10 +120,23 @@ rule run_import_jannovar_gnomad_exomes_v2_1_1:
         "scripts/import_jannovar.py"
 
 
+rule run_strip_gnomad_exomes_v2_1_1:
+    output:
+        vcf="gnomad-exomes-v2.1.1-GRCh37/stripped/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
+        tbi="gnomad-exomes-v2.1.1-GRCh37/stripped/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz.tbi",
+    input:
+        vcf="gnomad-exomes-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
+        tbi="gnomad-exomes-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz.tbi",
+    conda:
+        "envs/base.yaml"
+    script:
+        "scripts/strip_gnomad.py"
+
+
 rule run_download_gnomad_exomes_v2_1_1:
     output:
-        vcf="gnomad-v2.1.1-GRCh37/gnomad-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
-        tbi="gnomad-v2.1.1-GRCh37/gnomad-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz.tbi",
+        vcf="gnomad-exomes-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz",
+        tbi="gnomad-exomes-v2.1.1-GRCh37/download/gnomad.exomes.r2.1.1.sites.{chrom}.vcf.bgz.tbi",
     conda:
         "envs/base.yaml"
     script:

@@ -22,6 +22,8 @@
 # Formats are MM:SS, HH:MM:SS, Days-HH, Days-HH:MM, Days-HH:MM:SS
 #SBATCH --time=7-00:00
 
+set -x
+
 
 export TMPDIR=/fast/users/${USER}/scratch/tmp
 export LOGDIR=logs/${SLURM_JOB_NAME}-${SLURM_JOB_ID}
@@ -29,9 +31,7 @@ mkdir -p $LOGDIR
 
 unset DRMAA_LIBRARY_PATH
 eval "$($(which conda) shell.bash hook)"
-conda activate first-steps
-
-set -x
+conda activate snakemake-variant-enrichment
 
 JOBS=100
 
@@ -39,15 +39,18 @@ JOBS=100
 # --mem-per-cpu doesn't accept units and the default unit here is MB
 # -t only accepts HH:MM
 snakemake \
+    --jobscript bih_cluster_jobscript.sh \
+    --use-conda \
     --cluster-config bih_cluster_config.json \
     --drmaa " \
         -p critical \
         -t {cluster.time} \
         --nodes=1 \
         --mem={cluster.memory} \
-        -n {cluster.tasks} \
+        --cpus-per-task={cluster.threads} \
         -o $LOGDIR/%x-%j.log" \
     -j $JOBS \
     -k \
-    -p
+    -p \
+    $@
 
