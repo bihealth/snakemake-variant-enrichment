@@ -12,6 +12,10 @@ def get_output_files():
             yield "%(key)s/%(key)s.annotated.filtered.vcf.gz" % {"key": key}
             yield "%(key)s/%(key)s.annotated.filtered.vcf.gz.tbi" % {"key": key}
 
+    yield "gnomad-exomes-v2.1.1-GRCh37/gnomad.exomes.coverage_0.9_gt_10x.bed"
+    yield "gnomad-exomes-v2.1.1-GRCh37/gnomad.exomes.coverage_0.9_gt_10x.bed.bgz"
+    yield "gnomad-exomes-v2.1.1-GRCh37/gnomad.exomes.coverage_0.9_gt_10x.bed.bgz.tbi"
+
 
 rule default:
     input:
@@ -141,6 +145,30 @@ rule run_download_gnomad_exomes_v2_1_1:
         "envs/base.yaml"
     script:
         "scripts/download_gnomad_exomes_v2_1_1.py"
+
+
+rule run_download_gnomad_exomes_v2_1_1_coverage:
+    output:
+        tsv="gnomad-exomes-v2.1.1-GRCh37/download/gnomad.exomes.coverage.summary.tsv.bgz",
+        tbi="gnomad-exomes-v2.1.1-GRCh37/download/gnomad.exomes.coverage.summary.tsv.bgz.tbi",
+    conda:
+        "envs/base.yaml"
+    script:
+        "scripts/download_gnomad_exomes_v2_1_1_coverage.py"
+
+
+rule run_extract_good_cov_gnomad_exomes_v2_1_1:
+    input:
+        tsv="gnomad-exomes-v2.1.1-GRCh37/download/gnomad.exomes.coverage.summary.tsv.bgz",
+        tbi="gnomad-exomes-v2.1.1-GRCh37/download/gnomad.exomes.coverage.summary.tsv.bgz.tbi",
+    output:
+        bed="gnomad-exomes-v2.1.1-GRCh37/gnomad.exomes.coverage_0.9_gt_10x.bed",
+        bed_gz="gnomad-exomes-v2.1.1-GRCh37/gnomad.exomes.coverage_0.9_gt_10x.bed.bgz",
+        tbi="gnomad-exomes-v2.1.1-GRCh37/gnomad.exomes.coverage_0.9_gt_10x.bed.bgz.tbi",
+    conda:
+        "envs/base.yaml"
+    script:
+        "scripts/gnomad_exomes_good_cov.py"
 
 
 rule run_download_jannovar:

@@ -1,11 +1,14 @@
 # Files
 /background/**/*.vcf.gz
 /background/**/*.vcf.bgz
+/background/**/*.tsv.gz
+/background/**/*.tsv.bgz
 /background/**/*.tbi
 /background/**/*.h2.db
 /background/**/*.ser*
 /background/**/*.fa
 /background/**/*.fa.fai
+/background/**/*.bed*
 
 */logs
 

@@ -1,7 +1,5 @@
 from snakemake.shell import shell
 
-BASE_URL = "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502"
-
 shell(
     r"""
 set -x

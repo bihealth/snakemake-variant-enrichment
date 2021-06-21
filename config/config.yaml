@@ -21,7 +21,4 @@ background:
     release: v2.1.1
     description: >
       gnomAD exomes data set.
-    enable: false
-    annotation:
-      vep: 88
-      gencode: 19
+    enable: true
